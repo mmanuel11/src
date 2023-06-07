@@ -42,6 +42,19 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
 )
 
+# Install Python executables
+install(PROGRAMS
+  src/perception_rasp.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+# Install Python executables
+install(PROGRAMS
+  src/perception_test.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+
 set(dependencies "ament_index_cpp" "geometry_msgs" "rclcpp" "rclcpp_action" "std_msgs" "std_srvs")
 
 
