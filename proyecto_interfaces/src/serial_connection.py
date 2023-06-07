@@ -4,6 +4,7 @@ import time
 import serial
 from rclpy.node import Node
 from geometry_msgs.msg import Twist 
+from proyecto_interfaces.msg import String
 
 ser = serial.Serial("/dev/ttyACM0", baudrate=115200)
 
@@ -13,8 +14,8 @@ class MinimalSubscriber(Node):
         super().__init__('connection_serial')
 
 
-        self.subscription = self.create_subscription(
-            Twist,
+        self.arduino = self.create_subscription(
+            String,
             '/arduinoSerial',
             self.listener_callback,
             8)

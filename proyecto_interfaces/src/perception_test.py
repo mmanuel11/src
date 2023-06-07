@@ -8,6 +8,7 @@ from proyecto_interfaces.srv import StartPerceptionTest
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image # Image is the message type
 from proyecto_interfaces.msg import Banner
+import numpy as np
 
 bridge = CvBridge()
 image_path = "./src/proyecto_interfaces/resources/camera_image.jpeg"
@@ -19,19 +20,35 @@ class MinimalService(Node):
         self.start_perception_test = self.create_service(StartPerceptionTest, '/group_5/start_perception_test_srv', self.start_perception_test_callback)
         self.image_topic = self.create_subscription(
             Image,
-            'video_frames',
+            'arduinoSerial',
             self.image_topic_callback,
             10)
         self.image_topic  # prevent unused variable warning
 
-        self.vision = self.create_publisher(Banner, '/vision/banner_group_5', 10)
-
     def image_topic_callback(self, msg):
         print("Received an image!")
-        cv2_img = bridge.imgmsg_to_cv2(msg, "rgb8")
-        #M = cv2.getRotationMatrix2D((cv2_img.shape[1],cv2_img.shape[0]),90,1)
-        #imageOut = cv2.warpAffine(cv2_img,M,(cv2_img.shape[1],cv2_img.shape[0]))
-        cv2.imwrite(image_path, cv2_img)
+        imagen = bridge.imgmsg_to_cv2(msg, "rgb8")
+        alto, ancho = imagen.shape[:2]
+        # Definir el ángulo de rotación
+        angulo = 270
+        # Calcular el nuevo tamaño de la imagen después de la rotación
+        nuevo_ancho = int(ancho * abs(np.cos(np.radians(angulo))) + alto * abs(np.sin(np.radians(angulo))))
+        nuevo_alto = int(alto * abs(np.cos(np.radians(angulo))) + ancho * abs(np.sin(np.radians(angulo))))
+        # Obtener la matriz de rotación utilizando la función getRotationMatrix2D
+        matriz_rotacion = cv2.getRotationMatrix2D((ancho / 2, alto / 2), angulo, 1)
+        # Ajustar la matriz de rotación para evitar bordes negros
+        matriz_rotacion[0, 2] += (nuevo_ancho - ancho) / 2
+        matriz_rotacion[1, 2] += (nuevo_alto - alto) / 2
+        # Aplicar la rotación a la imagen utilizando la función warpAffin
+        imagen_rotada = cv2.warpAffine(imagen, matriz_rotacion, (nuevo_ancho, nuevo_alto))
+
+        #resize = cv2.resize(cv2_img, (54, 140))
+        #ancho = cv2_img.shape[1] #columnas
+        #alto = cv2_img.shape[0] # filas
+        # Rotación
+        #M = cv2.getRotationMatrix2D((ancho//2,alto//2),90,1)
+        #imageOut = cv2.warpAffine(cv2_img,M,(ancho,alto))
+        cv2.imwrite(image_path, imagen_rotada)
 
     def start_perception_test_callback(self, request, response):
         # Receive the request data and sum it
