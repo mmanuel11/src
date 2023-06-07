@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from proyecto_interfaces.srv import StartManipulationTest
 import rclpy
 from rclpy.node import Node
@@ -12,20 +13,19 @@ import time
 
 Plataforma = ""
 ObjetivoX = 0.0
-ObjetivoY = 0.0
+ObjetivoY = 0.1
 ObjetivoZ = 0.0
 
 class MinimalService(Node):
-    def _init_(self):
-        super()._init_('minimal_service')
-        self.srv = self.create_service(StartManipulationTest, '/group_5/start_manipulation_test_srv', self.start_manipulation_test_srv)
-=       timer_period = 0.5  # seconds
-        self.timer = self.create_timer(timer_period, self.Cinematica_inversa)
-        self.i = 0
+    def __init__(self):
+        super().__init__('minimal')
+
+        self.srv = self.create_service(StartManipulationTest, '/group_5/start_manipulation_test_srv', self.start_manipulation_test_callback)
+        timer_period = 0.5  # seconds
 
         self.arduino = self.create_publisher(String, 'arduinoSerial', 10)
         
-    def start_manipulation_test_srv(self, request, 11):
+    def start_manipulation_test_callback(self, request, response):
         global Plataforma,ObjetivoZ,ObjetivoX,ObjetivoY
         Plataforma = request.platform
         otra = "platform"
@@ -36,7 +36,8 @@ class MinimalService(Node):
             otra = "platform_1"
             ObjetivoY = 3.0
         ObjetivoX = 15.0
-        response.answer = "La ficha de tipo" + request.x + "se encuentra en la plataforma"+ Plataforma +  "y la llevaré a la plataforma "+ otra
+        self.Cinematica_inversa()
+        response.answer = "La ficha de tipo " + str(request.x) + " se encuentra en la plataforma "+ Plataforma +  " y la llevaré a la plataforma "+ otra
         return response
 
     def Cinematica_inversa(self):
@@ -49,13 +50,13 @@ class MinimalService(Node):
 
         # Imprimir las soluciones
         x_solution, y_solution = solution
-        deg_q1 = math.atan(ObjetivoZ/ObjetivoY)*(180/math.pi)
-        deg_q2 = 180-x_solution*(180/math.pi)
-        deg_q3 = 90-y_solution*(180/math.pi)
+        deg_q1 = round(90+math.atan(ObjetivoZ/ObjetivoY)*(180/math.pi))
+        deg_q2 = round(180-x_solution*(180/math.pi))
+        deg_q3 = round(90-y_solution*(180/math.pi))
         #print("Solución para x:", 180-x_solution*(180/math.pi))
         #print("Solución para y:", 90-y_solution*(180/math.pi))
-        msg_1.data = dar_formato(self, deg_q1, deg_q2, deg_q3, 150)
-        self.publisher_.publish(msg_1)
+        msg_1.data = self.dar_formato(str(deg_q1), str(deg_q2), str(deg_q3), str(150))
+        self.arduino.publish(msg_1)
         time.sleep(5)
 
         ObjetivoX = 5
@@ -67,12 +68,12 @@ class MinimalService(Node):
 
         # Imprimir las soluciones
         x_solution, y_solution = solution
-        deg_q1 = math.atan(ObjetivoZ/ObjetivoY)*(180/math.pi)
-        deg_q2 = 180-x_solution*(180/math.pi)
-        deg_q3 = 90-y_solution*(180/math.pi)
+        deg_q1 = round(90+math.atan(ObjetivoZ/ObjetivoY)*(180/math.pi))
+        deg_q2 = round(180-x_solution*(180/math.pi))
+        deg_q3 = round(90-y_solution*(180/math.pi))
         #print("Solución para x:", 180-x_solution*(180/math.pi))
         #print("Solución para y:", 90-y_solution*(180/math.pi))
-        msg_2.data = dar_formato(self, deg_q1, deg_q2, deg_q3, 0)
+        msg_2.data = self.dar_formato(str(deg_q1), str(deg_q2), str(deg_q3), str(0))
         self.arduino.publish(msg_2)
 
 

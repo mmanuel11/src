@@ -20,7 +20,7 @@ class MinimalService(Node):
         self.start_perception_test = self.create_service(StartPerceptionTest, '/group_5/start_perception_test_srv', self.start_perception_test_callback)
         self.image_topic = self.create_subscription(
             Image,
-            'arduinoSerial',
+            'video_frames',
             self.image_topic_callback,
             10)
         self.image_topic  # prevent unused variable warning
@@ -113,7 +113,7 @@ class MinimalService(Node):
 
             # Filtrar contornos con un área menor que el umbral deseado
             if area < 3000:
-                continue
+                continueMinimalService()
 
             # Aproximar el contorno a una forma más simple
             approx = cv2.approxPolyDP(contour, 0.01 * cv2.arcLength(contour, True), True)
