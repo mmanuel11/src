@@ -54,7 +54,8 @@ class ImagePublisher(Node):
       # Publish the image.
       # The 'cv2_to_imgmsg' method converts an OpenCV
       # image to a ROS 2 image message
-      self.publisher_.publish(self.br.cv2_to_imgmsg(frame))
+      self.publisher_.publish(self.br.cv2_to_imgmsg(frame, encoding='rgb8'))
+
  
     # Display the message on the console
     self.get_logger().info('Publishing video frame')
