@@ -44,6 +44,12 @@ install(PROGRAMS
 
 # Install Python executables
 install(PROGRAMS
+  src/serial_connection_teleop.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+# Install Python executables
+install(PROGRAMS
   src/perception_rasp.py
   DESTINATION lib/${PROJECT_NAME}
 )
@@ -60,12 +66,22 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-
-
 set(dependencies "ament_index_cpp" "geometry_msgs" "rclcpp" "rclcpp_action" "std_msgs" "std_srvs")
 
+rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
 
 
+add_executable(teleop src/teleop.cpp)
+ament_target_dependencies(teleop ${dependencies})
+target_link_libraries(teleop "${cpp_typesupport_target}")
+
+target_include_directories(teleop PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_features(teleop PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+
+install(TARGETS teleop
+  DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
