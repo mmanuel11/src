@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import cv2
 import pytesseract
 from proyecto_interfaces.srv import StartPerceptionTest

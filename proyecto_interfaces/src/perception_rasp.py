@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Basic ROS 2 program to publish real-time streaming 
 # video from your built-in webcam
 # Author:
