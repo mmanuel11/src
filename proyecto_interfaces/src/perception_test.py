@@ -22,7 +22,7 @@ class MinimalService(Node):
             Image,
             'video_frames',
             self.image_topic_callback,
-            10)
+            1)
         self.image_topic  # prevent unused variable warning
 
     def image_topic_callback(self, msg):

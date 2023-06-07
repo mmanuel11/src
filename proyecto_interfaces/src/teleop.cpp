@@ -145,7 +145,7 @@ public:
   {
     rclcpp::Node::SharedPtr nh_ = nh;
     /*Se crea un mensaje de tipo twist que contiene info del vector lineal y angular para ser publicado en el topico turtlebot_cmdVel" */
-    twist_pub_ = nh_->create_publisher<geometry_msgs::msg::Twist>("turtlebot_cmdVel", 1);
+    twist_pub_ = nh_->create_publisher<geometry_msgs::msg::Twist>("arduinoSerialTeleop", 1);
   }
 
   int keyLoop(float p_linear, float p_angular)

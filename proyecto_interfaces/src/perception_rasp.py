@@ -11,8 +11,10 @@ from rclpy.node import Node # Handles the creation of nodes
 from sensor_msgs.msg import Image # Image is the message type
 from cv_bridge import CvBridge # Package to convert between ROS and OpenCV Images
 import cv2 # OpenCV library
+from sensor_msgs.msg import CompressedImage
 import numpy as np
- 
+
+
 class ImagePublisher(Node):
   """
   Create an ImagePublisher class, which is a subclass of the Node class.
@@ -26,7 +28,7 @@ class ImagePublisher(Node):
       
     # Create the publisher. This publisher will publish an Image
     # to the video_frames topic. The queue size is 10 messages.
-    self.publisher_ = self.create_publisher(Image, 'video_frames', 10)
+    self.publisher_ = self.create_publisher(Image, 'video_frames', 1)
       
     # We will publish a message every 0.1 seconds
     timer_period = 5  # seconds
@@ -55,7 +57,10 @@ class ImagePublisher(Node):
       # Publish the image.
       # The 'cv2_to_imgmsg' method converts an OpenCV
       # image to a ROS 2 image message
-      self.publisher_.publish(self.br.cv2_to_imgmsg(frame, encoding='rgb8'))
+      
+      compressed_imgmsg = self.br.cv2_to_compressed_imgmsg(frame, dst_format='jpg')
+      # Publish the compressed image
+      self.publisher_.publish(compressed_imgmsg)
 
  
     # Display the message on the console
